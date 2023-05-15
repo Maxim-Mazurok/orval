@@ -8,9 +8,11 @@
 <script lang="ts" setup>
 import { computed, unref } from 'vue';
 import { useShowPetById } from '../api/endpoints/petstoreFromFileSpecWithTransformer';
+import { storeToRefs } from 'pinia';
+import { usePetStore } from '../store';
 
-const props = defineProps<{ petId: string }>();
-const petId = computed(() => props.petId);
+const petStore = usePetStore();
+const { selectedPetId: petId } = storeToRefs(petStore);
 const petQuery = useShowPetById(petId);
 const pet = computed(() => unref(petQuery?.data));
 </script>

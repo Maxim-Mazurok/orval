@@ -1,12 +1,7 @@
 <template>
   <div class="App">
     <header class="App-header">
-      <img src="./assets/logo.svg" class="App-logo" alt="logo" />
-      <Pet
-        v-if="selectedPetId"
-        :pet-id="selectedPetId"
-        :id="'selected-pet-' + selectedPetId"
-      />
+      <Pet :id="'selected-pet-' + selectedPetId" />
       <Pets @[SELECT_PET_ID_EVENT]="selectedPetId = $event" />
     </header>
   </div>
@@ -18,12 +13,15 @@ import { SELECT_PET_ID_EVENT } from './constants';
 
 import Pets from './components/pets.vue';
 import Pet from './components/pet.vue';
+import { usePetStore } from './store';
+import { storeToRefs } from 'pinia';
 
 export default defineComponent({
   name: 'App',
   components: { Pets, Pet },
   setup() {
-    const selectedPetId = ref();
+    const petStore = usePetStore();
+    const { selectedPetId } = storeToRefs(petStore);
 
     return { selectedPetId, SELECT_PET_ID_EVENT };
   },
