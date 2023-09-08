@@ -19,6 +19,7 @@ import {
   ContextSpecs,
   isObject,
   isBoolean,
+  jsStringEscape,
 } from '@orval/core';
 import uniq from 'lodash.uniq';
 
@@ -179,7 +180,7 @@ const generateZodValidationSchemaDefinition = (
     const isStartWithSlash = matches.startsWith('/');
     const isEndWithSlash = matches.endsWith('/');
 
-    const regexp = `new RegExp('${escape(
+    const regexp = `new RegExp('${jsStringEscape(
       matches.slice(isStartWithSlash ? 1 : 0, isEndWithSlash ? -1 : undefined),
     )}')`;
 
@@ -306,11 +307,25 @@ const deference = (
   schema: SchemaObject | ReferenceObject,
   context: ContextSpecs,
 ): SchemaObject => {
-  const { schema: resolvedSchema } = resolveRef<SchemaObject>(schema, context);
+  const refName = '$ref' in schema ? schema.$ref : undefined;
+  if (refName && context.parents?.includes(refName)) {
+    return {};
+  }
+
+  const childContext: ContextSpecs = {
+    ...context,
+    ...(refName
+      ? { parents: [...(context.parents || []), refName] }
+      : undefined),
+  };
+
+  const { schema: resolvedSchema } = resolveRef<SchemaObject>(
+    schema,
+    childContext,
+  );
 
   return Object.entries(resolvedSchema).reduce((acc, [key, value]) => {
-    acc[key] = deferenceScalar(value, context);
-
+    acc[key] = deferenceScalar(value, childContext);
     return acc;
   }, {} as any);
 };

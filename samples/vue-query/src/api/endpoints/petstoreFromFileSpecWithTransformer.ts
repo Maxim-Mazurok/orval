@@ -41,7 +41,7 @@ export const listPets = (
   return customInstance<Pets>({
     url: `/v${encodeURIComponent(String(unref(version)))}/pets`,
     method: 'get',
-    params,
+    params: unref(params),
     signal,
   });
 };
