@@ -302,7 +302,12 @@ export const getShowPetByIdInfiniteQueryOptions = <
     signal,
   }) => showPetById(petId, version, signal);
 
-  return { queryKey, queryFn, enabled: !!(version && petId), ...queryOptions };
+  return {
+    queryKey,
+    queryFn,
+    enabled: computed(() => !!unref(version && petId)),
+    ...queryOptions,
+  };
 };
 
 export type ShowPetByIdInfiniteQueryResult = NonNullable<
